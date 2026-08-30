@@ -1,12 +1,12 @@
 # Publishes a live, fully interactive preview of the site to GitHub Pages.
 #
-# `enablement: true` asks GitHub to switch Pages on for this repo the first
-# time the workflow runs, so there is nothing to click. It only works on a
-# public repo (or a paid plan) — Pages is unavailable on private repos on the
-# free plan, and the API refuses there.
-#
-# If that step ever fails, turn Pages on by hand once:
+# ONE-TIME SETUP (required once, cannot be automated):
 #   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#
+# The workflow token cannot create the Pages site itself. Tested both while the
+# repo was private and after making it public: the API returns "Resource not
+# accessible by integration" either way, so actions/configure-pages needs the
+# site to already exist. After that one click, every push to main redeploys.
 name: Preview
 
 on:
@@ -38,8 +38,6 @@ jobs:
       # match wherever Pages actually serves the site from.
       - uses: actions/configure-pages@v5
         id: pages
-        with:
-          enablement: true
 
       - run: npm ci
 
