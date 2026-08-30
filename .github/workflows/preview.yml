@@ -1,0 +1,63 @@
+# Publishes a live, fully interactive preview of the site to GitHub Pages.
+#
+# One-time setup, needed once per repo:
+#   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+# The workflow token cannot switch Pages on itself (the API returns "Resource
+# not accessible by integration"), so this step is manual. After that, every
+# push to the branch below redeploys automatically.
+name: Preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Supplies base_path (e.g. /Agency-website-), so the export's asset URLs
+      # match wherever Pages actually serves the site from.
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          NEXT_EXPORT: "1"
+          NEXT_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      # Pages would otherwise strip the underscore-prefixed _next directory.
+      - run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

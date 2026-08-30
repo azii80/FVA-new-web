@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   FrontVA design tokens
+   Brand colors are sampled from the official logo mark: the icon runs
+   from a bright azure (top-left) to an indigo/blue-violet (bottom-right),
+   and the wordmark is a near-black neutral.
+   ------------------------------------------------------------------ */
+@theme {
+  /* Brand — azure → indigo, straight from the logo gradient */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dbe7ff;
+  --color-brand-200: #bed3ff;
+  --color-brand-300: #92b5ff;
+  --color-brand-400: #5e8dfb;
+  --color-brand-500: #2b6bf3; /* azure — logo, top-left */
+  --color-brand-600: #1a56e8;
+  --color-brand-700: #1743cc;
+
+  --color-indigo-brand-400: #7b74ef;
+  --color-indigo-brand-500: #4f46e5; /* indigo — logo, bottom-right */
+  --color-indigo-brand-600: #4038cf;
+
+  /* Neutrals — off-white canvas, near-black type, hairline borders */
+  --color-ink: #121317;
+  --color-ink-muted: #5b6070;
+  --color-ink-soft: #878da0;
+  --color-canvas: #fbfbfd;
+  --color-surface: #ffffff;
+  --color-line: #ececf1;
+  --color-line-soft: #f3f3f7;
+
+  --breakpoint-xs: 25rem;
+
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-2xs: 0.5rem;
+  --radius-4xl: 1.75rem;
+  --radius-5xl: 2.25rem;
+
+  --shadow-soft: 0 1px 2px rgb(18 19 23 / 0.04), 0 8px 24px -12px rgb(18 19 23 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(18 19 23 / 0.04), 0 24px 48px -20px rgb(18 19 23 / 0.18);
+  --shadow-brand: 0 12px 32px -12px rgb(43 107 243 / 0.45);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* keeps sticky-nav anchor jumps clear of the navbar */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-500);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.035em;
+  }
+
+  /* Headings that wrap freely read better balanced; the hero and section
+     headings carry their own explicit line breaks, so they opt out. */
+  h2, h3 {
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  .brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-brand-500) 0%,
+      var(--color-indigo-brand-500) 100%
+    );
+  }
+
+  .brand-text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-brand-500) 0%,
+      var(--color-indigo-brand-500) 92%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Hairline card border that survives on both white and off-white */
+  .hairline {
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Fades the edge of horizontally scrollable rails on mobile */
+  @media (width < 64rem) {
+    .edge-fade-x {
+      mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 24px,
+        #000 calc(100% - 24px),
+        transparent 100%
+      );
+    }
+  }
+
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, var(--color-line-soft) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-line-soft) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+}
+
+/* Dashed connector paths that keep flowing — the "system is running" cue */
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.animate-flow {
+  animation: flow-dash 18s linear infinite;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-flow,
+  [data-motion-drift] {
+    animation: none !important;
+  }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
