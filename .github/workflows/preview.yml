@@ -1,10 +1,12 @@
 # Publishes a live, fully interactive preview of the site to GitHub Pages.
 #
-# One-time setup, needed once per repo:
+# `enablement: true` asks GitHub to switch Pages on for this repo the first
+# time the workflow runs, so there is nothing to click. It only works on a
+# public repo (or a paid plan) — Pages is unavailable on private repos on the
+# free plan, and the API refuses there.
+#
+# If that step ever fails, turn Pages on by hand once:
 #   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
-# The workflow token cannot switch Pages on itself (the API returns "Resource
-# not accessible by integration"), so this step is manual. After that, every
-# push to the branch below redeploys automatically.
 name: Preview
 
 on:
@@ -32,10 +34,12 @@ jobs:
           node-version: 22
           cache: npm
 
-      # Supplies base_path (e.g. /Agency-website-), so the export's asset URLs
+      # Supplies base_path (e.g. /FVA-new-web), so the export's asset URLs
       # match wherever Pages actually serves the site from.
       - uses: actions/configure-pages@v5
         id: pages
+        with:
+          enablement: true
 
       - run: npm ci
 
